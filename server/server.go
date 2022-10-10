@@ -42,6 +42,7 @@ func (s *Server) TearDown() error {
 func (s *Server) router() *mux.Router {
 	router := mux.NewRouter()
 	router.StrictSlash(true)
-	router.HandleFunc("/health", health).Methods("GET")
+	router.HandleFunc("/health", health).Methods(http.MethodGet)
+	router.HandleFunc("/sector", location).Methods(http.MethodPost)
 	return router
 }

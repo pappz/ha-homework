@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestServer_Health(t *testing.T) {
+func TestHealth(t *testing.T) {
 	s := NewServer()
 	testServer := httptest.NewServer(s.router())
 	defer testServer.Close()
@@ -26,5 +26,4 @@ func TestServer_Health(t *testing.T) {
 	if healthResponse != string(actual) {
 		t.Errorf("invalid response msg: '%s'\n", string(actual))
 	}
-
 }
