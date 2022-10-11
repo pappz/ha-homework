@@ -1,4 +1,4 @@
-package server
+package middleware
 
 import (
 	"encoding/json"
@@ -11,7 +11,6 @@ var (
 )
 
 type ErrorResponse struct {
-	Error   bool
 	Message string
 }
 
@@ -24,10 +23,20 @@ func responseError(w http.ResponseWriter, e error) {
 	}
 
 	resp := ErrorResponse{
-		true,
 		e.Error(),
 	}
 	if j, err := json.Marshal(resp); err == nil {
 		_, _ = w.Write(j)
 	}
+}
+
+func responseJson(w http.ResponseWriter, data interface{}) error {
+	w.Header().Set("Content-Type", "application/json;charset=utf-8")
+	j, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+
+	_, err = w.Write(j)
+	return err
 }

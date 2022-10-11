@@ -1,15 +1,17 @@
-package server
+package controllers
 
 import (
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/pappz/ha-homework/service"
 )
 
 func TestHealth(t *testing.T) {
-	s := NewServer()
-	testServer := httptest.NewServer(s.router())
+	serviceService := service.NewSector(56)
+	testServer := httptest.NewServer(Router(serviceService))
 	defer testServer.Close()
 
 	resp, err := http.Get(testServer.URL + "/health")
@@ -23,7 +25,7 @@ func TestHealth(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if healthResponse != string(actual) {
+	if HealthResponse != string(actual) {
 		t.Errorf("invalid response msg: '%s'\n", string(actual))
 	}
 }

@@ -6,10 +6,12 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gorilla/mux"
+	"github.com/pappz/ha-homework/service"
+	"github.com/pappz/ha-homework/web/controllers"
 )
 
 type Server struct {
+	service   service.Sector
 	webServer http.Server
 }
 
@@ -20,7 +22,7 @@ func NewServer() Server {
 func (s *Server) Listen(port string) {
 	s.webServer = http.Server{
 		Addr:         port,
-		Handler:      s.router(),
+		Handler:      controllers.Router(s.service),
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
 	}
@@ -37,12 +39,4 @@ func (s *Server) TearDown() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	return s.webServer.Shutdown(ctx)
-}
-
-func (s *Server) router() *mux.Router {
-	router := mux.NewRouter()
-	router.StrictSlash(true)
-	router.HandleFunc("/health", health).Methods(http.MethodGet)
-	router.HandleFunc("/sector", location).Methods(http.MethodPost)
-	return router
 }
