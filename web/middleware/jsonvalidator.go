@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
-	"net/http"
 )
 
 var (
@@ -16,8 +15,8 @@ type InputValidation interface {
 	Validate() error
 }
 
-func unmarshalAndValidate(r *http.Request, v interface{}) error {
-	body, err := io.ReadAll(r.Body)
+func unmarshalAndValidate(r io.Reader, v interface{}) error {
+	body, err := io.ReadAll(r)
 	if err != nil {
 		return errFailedToReadBody
 	}

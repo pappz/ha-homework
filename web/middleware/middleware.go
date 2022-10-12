@@ -25,8 +25,7 @@ func (m Middleware) Handle(h handler.Handler) func(http.ResponseWriter, *http.Re
 			R:       r,
 			Service: m.service,
 		}
-		if err := unmarshalAndValidate(r, ri.Data); err != nil {
-			//log.Errorf(err.Error())
+		if err := unmarshalAndValidate(r.Body, ri.Data); err != nil {
 			responseError(w, err)
 			return
 		}
