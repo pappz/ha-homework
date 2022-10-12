@@ -1,4 +1,4 @@
-package handler
+package middleware
 
 import (
 	"net/http"
@@ -16,6 +16,6 @@ type RequestInfo struct {
 type ResponseData interface{}
 
 type Handler interface {
-	RequestDataType() interface{}
+	RequestDataType() Json
 	Do(RequestInfo) (ResponseData, error)
 }

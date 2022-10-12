@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/pappz/ha-homework/service"
-	"github.com/pappz/ha-homework/web/handler"
 )
 
 type Middleware struct {
@@ -17,9 +16,9 @@ func NewMiddleware(service service.Sector) Middleware {
 	}
 }
 
-func (m Middleware) Handle(h handler.Handler) func(http.ResponseWriter, *http.Request) {
+func (m Middleware) Handle(h Handler) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		ri := handler.RequestInfo{
+		ri := RequestInfo{
 			Data:    h.RequestDataType(),
 			W:       w,
 			R:       r,

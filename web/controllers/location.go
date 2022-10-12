@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/pappz/ha-homework/service"
-	"github.com/pappz/ha-homework/web/handler"
+	"github.com/pappz/ha-homework/web/middleware"
 )
 
 var (
@@ -13,10 +13,10 @@ var (
 )
 
 type LocationRequest struct {
-	X   float64 `json:",string"`
-	Y   float64 `json:",string"`
-	Z   float64 `json:",string"`
-	Vel float64 `json:",string"`
+	X   float64 `json:"x,string"`
+	Y   float64 `json:"y,string"`
+	Z   float64 `json:"z,string"`
+	Vel float64 `json:"vel,string"`
 }
 
 func (rd LocationRequest) Validate() error {
@@ -42,12 +42,12 @@ type LocationResponse struct {
 type Location struct {
 }
 
-func (h Location) RequestDataType() interface{} {
-	return LocationRequest{}
+func (h Location) RequestDataType() middleware.Json {
+	return &LocationRequest{}
 }
 
-func (h Location) Do(ri handler.RequestInfo) (handler.ResponseData, error) {
-	rd := ri.Data.(LocationRequest)
+func (h Location) Do(ri middleware.RequestInfo) (middleware.ResponseData, error) {
+	rd := ri.Data.(*LocationRequest)
 	dd := service.DroneData{
 		X:        rd.X,
 		Y:        rd.Y,

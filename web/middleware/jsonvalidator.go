@@ -11,7 +11,7 @@ var (
 	errMissingBody      = errors.New("missing body")
 )
 
-type InputValidation interface {
+type Json interface {
 	Validate() error
 }
 
@@ -33,7 +33,7 @@ func unmarshalAndValidate(r io.Reader, v interface{}) error {
 		return err
 	}
 
-	iv, ok := v.(InputValidation)
+	iv, ok := v.(Json)
 	if !ok {
 		return nil
 	}
