@@ -11,22 +11,23 @@ import (
 )
 
 type Server struct {
-	service   service.Sector
-	webServer http.Server
+	webServer *http.Server
 }
 
-func NewServer() Server {
-	return Server{}
-}
-
-func (s *Server) Listen(port string) {
-	s.webServer = http.Server{
+func NewServer(port string, service service.Sector) Server {
+	httpServer := http.Server{
 		Addr:         port,
-		Handler:      controllers.Router(s.service),
+		Handler:      controllers.Router(service),
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
 	}
 
+	return Server{
+		&httpServer,
+	}
+}
+
+func (s *Server) Listen() {
 	go func() {
 		err := s.webServer.ListenAndServe()
 		if err != nil && err != http.ErrServerClosed {
