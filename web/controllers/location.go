@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/pappz/ha-homework/service"
 	"github.com/pappz/ha-homework/web/middleware"
@@ -36,7 +37,7 @@ func (rd LocationRequest) Validate() error {
 }
 
 type LocationResponse struct {
-	Location float64 `json:"loc,string"`
+	Location string `json:"loc"`
 }
 
 type Location struct {
@@ -54,8 +55,14 @@ func (h Location) Do(ri middleware.RequestInfo) (middleware.ResponseData, error)
 		Z:        rd.Z,
 		Velocity: rd.Vel,
 	}
+
+	loc := ri.Service.Location(dd)
 	resp := LocationResponse{
-		ri.Service.Location(dd),
+		h.formatFloat(loc),
 	}
 	return resp, nil
+}
+
+func (h Location) formatFloat(f float64) string {
+	return fmt.Sprintf("%.2f", f)
 }
