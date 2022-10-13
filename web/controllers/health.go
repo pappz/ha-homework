@@ -9,6 +9,7 @@ const (
 	HealthResponse = `{"alive": true}`
 )
 
+// Health controller to ensure the service is alive
 type Health struct {
 }
 

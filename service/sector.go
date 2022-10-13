@@ -1,5 +1,8 @@
 package service
 
+// Sector service provide the location of databank for drone
+// TODO: write validation for the input parameters. Unfortunately
+// it was not well specified.
 type Sector struct {
 	id float64
 }

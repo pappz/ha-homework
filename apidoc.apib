@@ -1,0 +1,36 @@
+FORMAT: 1A
+HOST: https://127.0.0.1:8080/
+
+# HA drone navigation api
+
+## Service health feedback [/health]
+You can ensure the webservice state
+
+### Get the state [GET]
+
++ Response 200 (application/json)
+
+    {
+        "alive":true
+    }
+
+## Databank location [/databank]
+
+### Response with the location of databank [POST]
+In the request parameters must set coords of the drone and the velocity
+
++ Request (application/json)
+
+    {
+        "x": "123.12",
+        "y": "456.56",
+        "z": "789.89",
+        "vel": "20.0"
+    }
+
++ Response 200 (application/json)
+
+    {
+        "loc":"1389.57"
+    }
+

@@ -12,6 +12,7 @@ var (
 	errInvalidVelocity   = errors.New("invalid velocity")
 )
 
+// LocationRequest input parameters from the drones
 type LocationRequest struct {
 	X   *float64 `json:"x,string"`
 	Y   *float64 `json:"y,string"`
@@ -35,10 +36,12 @@ func (rd LocationRequest) Validate() error {
 	return nil
 }
 
+// LocationResponse to the request
 type LocationResponse struct {
 	Location string `json:"loc"`
 }
 
+// Location is the http controller for the location of databank
 type Location struct {
 }
 
