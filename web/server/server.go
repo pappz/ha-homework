@@ -2,9 +2,10 @@ package server
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/pappz/ha-homework/service"
 	"github.com/pappz/ha-homework/web/controllers"
@@ -35,7 +36,7 @@ func (s *Server) Listen() {
 	go func() {
 		err := s.webServer.ListenAndServe()
 		if err != nil && err != http.ErrServerClosed {
-			log.Fatalf("ListenAndServe error: %s", err)
+			log.Fatalf("listen error: '%s'", err)
 		}
 	}()
 }

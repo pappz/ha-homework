@@ -3,6 +3,8 @@ package middleware
 import (
 	"encoding/json"
 	"errors"
+	"github.com/sirupsen/logrus"
+	"github.com/webkeydev/logger"
 	"io"
 	"net/http"
 
@@ -40,6 +42,8 @@ func NewMiddleware(service service.Sector) Middleware {
 // response with error code and message reason in json format.
 func (m Middleware) Handle(h Handler) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
+		rlog := logger.NewLogger("middleware").WithFields(logrus.Fields{"addr": r.RemoteAddr})
+		rlog.Debugf("new request")
 		ri := RequestInfo{
 			Data:    h.RequestDataType(),
 			W:       w,
@@ -47,12 +51,14 @@ func (m Middleware) Handle(h Handler) func(http.ResponseWriter, *http.Request) {
 			Service: m.service,
 		}
 		if err := m.unmarshalAndValidate(r.Body, ri.Data); err != nil {
+			rlog.Debugf("unmarshal issue: '%s'", err.Error())
 			m.responseError(w, err)
 			return
 		}
 
 		v, err := h.Do(ri)
 		if err != nil {
+			rlog.Debugf("handler error: '%s'", err.Error())
 			m.responseError(w, err)
 			return
 		}
@@ -62,7 +68,7 @@ func (m Middleware) Handle(h Handler) func(http.ResponseWriter, *http.Request) {
 		}
 
 		if err := m.responseJson(w, v); err != nil {
-			// log.Errorf("failed to send json: %s", err.Error())
+			rlog.Debug("failed to send json: %s", err.Error())
 		}
 	}
 }

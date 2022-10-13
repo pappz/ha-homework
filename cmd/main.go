@@ -1,20 +1,27 @@
 package main
 
 import (
-	"log"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
 
+	"github.com/webkeydev/logger"
+
 	"github.com/pappz/ha-homework/service"
 	"github.com/pappz/ha-homework/web/server"
 )
+
+func init() {
+	logger.SetTxtLogger()
+	_ = logger.SetLoggerLevel("debug")
+}
 
 var (
 	osSigs    = make(chan os.Signal, 1)
 	wgExit    sync.WaitGroup
 	webServer server.Server
+	log       = logger.NewLogger("ha-dns")
 )
 
 func handleExitSignal() {

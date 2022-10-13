@@ -41,3 +41,10 @@ The service is configurable with environment variables.
 HA_ADDRESS=:8080
 HA_SECTOR_ID=1
 ```
+
+## Code structure of the service
+
+This service has 3 main component.
+- cmd: this is the runnable package
+- service: these calculate the locations
+- web: this build up the webserver and the controllers
