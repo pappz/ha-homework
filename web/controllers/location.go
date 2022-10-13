@@ -3,7 +3,6 @@ package controllers
 import (
 	"errors"
 	"fmt"
-
 	"github.com/pappz/ha-homework/service"
 	"github.com/pappz/ha-homework/web/middleware"
 )
@@ -14,23 +13,23 @@ var (
 )
 
 type LocationRequest struct {
-	X   float64 `json:"x,string"`
-	Y   float64 `json:"y,string"`
-	Z   float64 `json:"z,string"`
-	Vel float64 `json:"vel,string"`
+	X   *float64 `json:"x,string"`
+	Y   *float64 `json:"y,string"`
+	Z   *float64 `json:"z,string"`
+	Vel *float64 `json:"vel,string"`
 }
 
 func (rd LocationRequest) Validate() error {
-	if rd.X < 0 {
+	if rd.X == nil || *rd.X < 0 {
 		return errInvalidCoordinate
 	}
-	if rd.Y < 0 {
+	if rd.Y == nil || *rd.Y < 0 {
 		return errInvalidCoordinate
 	}
-	if rd.Z < 0 {
+	if rd.Z == nil || *rd.Z < 0 {
 		return errInvalidCoordinate
 	}
-	if rd.Vel <= 0 {
+	if rd.Vel == nil || *rd.Vel <= 0 {
 		return errInvalidVelocity
 	}
 	return nil
@@ -50,10 +49,10 @@ func (h Location) RequestDataType() middleware.Json {
 func (h Location) Do(ri middleware.RequestInfo) (middleware.ResponseData, error) {
 	rd := ri.Data.(*LocationRequest)
 	dd := service.DroneData{
-		X:        rd.X,
-		Y:        rd.Y,
-		Z:        rd.Z,
-		Velocity: rd.Vel,
+		X:        *rd.X,
+		Y:        *rd.Y,
+		Z:        *rd.Z,
+		Velocity: *rd.Vel,
 	}
 
 	loc := ri.Service.Location(dd)
