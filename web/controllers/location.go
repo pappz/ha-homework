@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"errors"
-	"fmt"
 	"github.com/pappz/ha-homework/service"
 	"github.com/pappz/ha-homework/web/middleware"
 )
@@ -38,7 +37,7 @@ func (rd LocationRequest) Validate() error {
 
 // LocationResponse to the request
 type LocationResponse struct {
-	Location string `json:"loc"`
+	Location float64 `json:"loc"`
 }
 
 // Location is the http controller for the location of databank
@@ -60,11 +59,7 @@ func (h Location) Do(ri middleware.RequestInfo) (middleware.ResponseData, error)
 
 	loc := ri.Service.Location(dd)
 	resp := LocationResponse{
-		h.formatFloat(loc),
+		loc,
 	}
 	return resp, nil
-}
-
-func (h Location) formatFloat(f float64) string {
-	return fmt.Sprintf("%.2f", f)
 }

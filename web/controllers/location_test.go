@@ -36,9 +36,9 @@ func TestLocation_sampleData(t *testing.T) {
 				"z": "789.89",
 				"vel": "20.0"
 			}`)
-	expectedResult := `{"loc":"1389.57"}`
+	expectedResult := `{"loc":1389.57}`
 
-	resp, err := doRequest(http.MethodPost, testServer.URL+"/sector", bytes.NewBuffer(requestData))
+	resp, err := doRequest(http.MethodPost, testServer.URL+"/databank", bytes.NewBuffer(requestData))
 	if err != nil {
 		t.Fatalf("client request error: %s\n", err.Error())
 	}
@@ -73,7 +73,7 @@ func TestLocation_missingCoords(t *testing.T) {
 	}
 
 	for i := 0; i < len(cases); i++ {
-		resp, err := doRequest(http.MethodPost, testServer.URL+"/sector", bytes.NewBuffer(cases[i]))
+		resp, err := doRequest(http.MethodPost, testServer.URL+"/databank", bytes.NewBuffer(cases[i]))
 		if err != nil {
 			t.Fatalf("client request error: %s\n", err.Error())
 		}
@@ -96,7 +96,7 @@ func TestLocation_missingVel(t *testing.T) {
 				"z": "789.89"
 			}`)
 
-	resp, err := doRequest(http.MethodPost, testServer.URL+"/sector", bytes.NewBuffer(requestData))
+	resp, err := doRequest(http.MethodPost, testServer.URL+"/databank", bytes.NewBuffer(requestData))
 	if err != nil {
 		t.Fatalf("client request error: %s\n", err.Error())
 	}
@@ -144,7 +144,7 @@ func TestLocation_wrongTypes(t *testing.T) {
 	}
 
 	for i := 0; i < len(cases); i++ {
-		resp, err := doRequest(http.MethodPost, testServer.URL+"/sector", bytes.NewBuffer(cases[i]))
+		resp, err := doRequest(http.MethodPost, testServer.URL+"/databank", bytes.NewBuffer(cases[i]))
 		if err != nil {
 			t.Fatalf("client request error: %s\n", err.Error())
 		}

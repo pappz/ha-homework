@@ -14,6 +14,6 @@ func Router(s service.Sector) *mux.Router {
 	router := mux.NewRouter()
 	router.StrictSlash(true)
 	router.HandleFunc("/health", m.Handle(Health{})).Methods(http.MethodGet)
-	router.HandleFunc("/sector", m.Handle(Location{})).Methods(http.MethodPost)
+	router.HandleFunc("/databank", m.Handle(Location{})).Methods(http.MethodPost)
 	return router
 }
