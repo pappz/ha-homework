@@ -48,3 +48,7 @@ This service has 3 main component.
 - cmd: this is the runnable package
 - service: these calculate the locations
 - web: this build up the webserver and the controllers
+
+## API doc
+
+The API has been documented in Apiary format. Please check the *apidoc.apib* file for more details
