@@ -6,8 +6,8 @@ import (
 	"github.com/pappz/ha-homework/service"
 )
 
-// RequestInfo pass to all controllers. The Data is the struct
-// what required by the controller as input parameter
+// RequestInfo will be passed to all controllers. The Data is the struct
+// what required by the controller as input parameter.
 type RequestInfo struct {
 	Data    Json
 	W       http.ResponseWriter
