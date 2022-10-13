@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/pappz/ha-homework/service"
@@ -15,13 +16,20 @@ import (
 var (
 	errMsgInvalidCoordinate = fmt.Sprintf(`{"Message":"%s"}`, errInvalidCoordinate.Error())
 	errMsgInvalidVelocity   = fmt.Sprintf(`{"Message":"%s"}`, errInvalidVelocity.Error())
+	testServer              *httptest.Server
 )
 
-func TestLocation_sampleData(t *testing.T) {
+func TestMain(m *testing.M) {
 	serviceService := service.NewSector(1)
-	testServer := httptest.NewServer(Router(serviceService))
-	defer testServer.Close()
+	testServer = httptest.NewServer(Router(serviceService))
 
+	code := m.Run()
+
+	testServer.Close()
+	os.Exit(code)
+}
+
+func TestLocation_sampleData(t *testing.T) {
 	requestData := []byte(`{
 				"x": "123.12",
 				"y": "456.56",
@@ -46,10 +54,6 @@ func TestLocation_sampleData(t *testing.T) {
 }
 
 func TestLocation_missingCoords(t *testing.T) {
-	serviceService := service.NewSector(1)
-	testServer := httptest.NewServer(Router(serviceService))
-	defer testServer.Close()
-
 	cases := [][]byte{
 		[]byte(`{
 				"y": "456.56",
@@ -86,10 +90,6 @@ func TestLocation_missingCoords(t *testing.T) {
 }
 
 func TestLocation_missingVel(t *testing.T) {
-	serviceService := service.NewSector(1)
-	testServer := httptest.NewServer(Router(serviceService))
-	defer testServer.Close()
-
 	requestData := []byte(`{
 				"x": "123.12",
 				"y": "456.56",
