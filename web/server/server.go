@@ -14,9 +14,11 @@ type Server struct {
 	webServer *http.Server
 }
 
-func NewServer(port string, service service.Sector) Server {
+// NewServer create a new http server. The service used by controllers.
+// The server will listen on the 'addr' address.
+func NewServer(addr string, service service.Sector) Server {
 	httpServer := http.Server{
-		Addr:         port,
+		Addr:         addr,
 		Handler:      controllers.Router(service),
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
@@ -27,6 +29,8 @@ func NewServer(port string, service service.Sector) Server {
 	}
 }
 
+// Listen listens on the TCP network address s.Addr.
+// In case of error the program drop a fatal error
 func (s *Server) Listen() {
 	go func() {
 		err := s.webServer.ListenAndServe()
@@ -36,6 +40,8 @@ func (s *Server) Listen() {
 	}()
 }
 
+// TearDown gracefully shuts down the server.
+// The timeout is 30 second by default.
 func (s *Server) TearDown() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()

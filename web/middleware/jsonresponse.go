@@ -25,9 +25,11 @@ func responseError(w http.ResponseWriter, e error) {
 	resp := ErrorResponse{
 		e.Error(),
 	}
-	if j, err := json.Marshal(resp); err == nil {
-		_, _ = w.Write(j)
-	}
+
+	// json marshal error never should happen so ignore it
+	j, _ := json.Marshal(resp)
+	_, _ = w.Write(j)
+	return
 }
 
 func responseJson(w http.ResponseWriter, data interface{}) error {
