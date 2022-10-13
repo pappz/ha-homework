@@ -1,0 +1,24 @@
+version: "3.7"
+
+services:
+  ha-dns:
+    build: .
+    command: ha-dns
+    ports: [ "8080:8080" ]
+    networks:
+      ha-dns-net:
+        ipv4_address: 169.253.0.2
+    environment:
+      - DOCKER_API_VERSION=1.39
+      - HA_ADDRESS=:8080
+      - HA_SECTOR_ID=1
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+networks:
+  ha-dns-net:
+    ipam:
+      driver: default
+      config:
+        - subnet: 169.253.0.0/24
+          gateway: 169.253.0.1
