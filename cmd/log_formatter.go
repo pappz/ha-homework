@@ -8,6 +8,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+
+// MyFromatter custom, human readable log format
 type MyFormatter struct {
 	TimestampFormat string
 	LevelDesc       []string
@@ -38,15 +40,12 @@ func (f *MyFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	return []byte(fmt.Sprintf("%s %s [%s] %s%s: %s\n", entry.Time.Format(f.TimestampFormat), f.LevelDesc[entry.Level], entry.Data["tag"], fields, entry.Data["source"], entry.Message)), nil
 }
 
-// ContextHook ...
 type ContextHook struct{}
 
-// Levels ...
 func (hook ContextHook) Levels() []logrus.Level {
 	return logrus.AllLevels
 }
 
-// Fire ...
 func (hook ContextHook) Fire(entry *logrus.Entry) error {
 	_, pkg := path.Split(path.Dir(entry.Caller.File))
 	file := path.Base(entry.Caller.File)

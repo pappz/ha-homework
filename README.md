@@ -17,7 +17,7 @@ Corp, were tasked to develop a drone navigation service (DNS):
 
 ### Dockerfile
 
-The Dockerfile will build the project and the image carry the service itself
+With the *Dockerfile* you can build and run the service itself.
 
 ### Docker-compose
 
