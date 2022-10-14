@@ -25,7 +25,7 @@ There's a docker-compose.yml file included you can use as a starting point.
 You can configure the service with environment variables.
 
 The project should work out of the box using
-```
+```shell
 docker-compose up --build
 ```
 
@@ -40,6 +40,16 @@ The service is configurable with environment variables.
 ```
 HA_ADDRESS=:8080
 HA_SECTOR_ID=1
+```
+
+## Example usage
+
+With the curl command line tool you can try out the service easily.
+
+```shell
+curl -XPOST  http://127.0.0.1:8080/databank \
+-H 'Content-Type: application/json' \
+-d '{"x": "123.12","y": "456.56","z": "789.89","vel": "20.0"}'
 ```
 
 ## Code structure of the service
