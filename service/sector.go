@@ -7,6 +7,7 @@ type Sector struct {
 	id float64
 }
 
+// NewSector create new sector service
 func NewSector(id int) Sector {
 	return Sector{
 		float64(id),
