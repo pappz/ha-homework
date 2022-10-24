@@ -2,14 +2,25 @@ package api
 
 import (
 	"errors"
+	"github.com/gorilla/mux"
 	"github.com/pappz/ha-homework/service"
 	"github.com/pappz/ha-homework/web/middleware"
+	"net/http"
 )
 
 var (
 	errInvalidCoordinate = errors.New("invalid coordinate")
 	errInvalidVelocity   = errors.New("invalid velocity")
 )
+
+// RegisterLocationHandler sets up the routing of the HTTP handlers.
+func RegisterLocationHandler(router *mux.Router, service service.Sector) {
+	m := middleware.JsonParser{}
+	l := location{
+		service: service,
+	}
+	router.HandleFunc("/databank", m.Handle(l)).Methods(http.MethodPost)
+}
 
 // LocationRequest input parameters from the drones
 type LocationRequest struct {
@@ -40,16 +51,13 @@ type LocationResponse struct {
 	Location float64 `json:"loc"`
 }
 
-// Location is the http controller for the location of databank
-type Location struct {
+// location is the http controller for the location of databank
+type location struct {
+	service service.Sector
 }
 
-func (h Location) RequestDataType() middleware.Json {
-	return &LocationRequest{}
-}
-
-func (h Location) Do(ri middleware.RequestInfo) (middleware.ResponseData, error) {
-	rd := ri.Data.(*LocationRequest)
+func (h location) Handle(ri middleware.RequestInfo) (middleware.ResponseData, error) {
+	rd := ri.Payload.(*LocationRequest)
 	dd := service.DroneData{
 		X:        *rd.X,
 		Y:        *rd.Y,
@@ -57,9 +65,13 @@ func (h Location) Do(ri middleware.RequestInfo) (middleware.ResponseData, error)
 		Velocity: *rd.Vel,
 	}
 
-	loc := ri.Service.Location(dd)
+	loc := h.service.Location(dd)
 	resp := LocationResponse{
 		loc,
 	}
 	return resp, nil
+}
+
+func (h location) Payload() middleware.Json {
+	return &LocationRequest{}
 }

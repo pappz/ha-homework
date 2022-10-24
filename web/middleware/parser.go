@@ -3,12 +3,11 @@ package middleware
 import (
 	"encoding/json"
 	"errors"
-	"github.com/sirupsen/logrus"
-	"github.com/webkeydev/logger"
 	"io"
 	"net/http"
 
-	"github.com/pappz/ha-homework/service"
+	"github.com/sirupsen/logrus"
+	"github.com/webkeydev/logger"
 )
 
 var (
@@ -26,14 +25,6 @@ type ErrorResponse struct {
 // controllers and handle errors with the proper status codes. The middlware
 // manage the http headers and status codes in the response.
 type JsonParser struct {
-	service service.Sector
-}
-
-// NewJsonParser instantiate a new JsonParser
-func NewJsonParser(service service.Sector) JsonParser {
-	return JsonParser{
-		service: service,
-	}
 }
 
 // Handle doing validation on the Json request. In case of err it send response
@@ -43,20 +34,18 @@ func NewJsonParser(service service.Sector) JsonParser {
 func (m JsonParser) Handle(h Handler) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		rlog := logger.NewLogger("middleware").WithFields(logrus.Fields{"addr": r.RemoteAddr})
-		rlog.Debugf("new request")
 		ri := RequestInfo{
-			Data:    h.RequestDataType(),
 			W:       w,
 			R:       r,
-			Service: m.service,
+			Payload: h.Payload(),
 		}
-		if err := m.unmarshalAndValidate(r.Body, ri.Data); err != nil {
+		if err := m.unmarshalAndValidate(r.Body, ri.Payload); err != nil {
 			rlog.Debugf("unmarshal issue: '%s'", err.Error())
 			m.responseError(w, err)
 			return
 		}
 
-		v, err := h.Do(ri)
+		v, err := h.Handle(ri)
 		if err != nil {
 			rlog.Debugf("handler error: '%s'", err.Error())
 			m.responseError(w, err)

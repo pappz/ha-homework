@@ -1,17 +1,17 @@
 package api
 
 import (
+	"github.com/gorilla/mux"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	"github.com/pappz/ha-homework/service"
 )
 
 func TestHealth(t *testing.T) {
-	serviceService := service.NewSector(56)
-	testServer := httptest.NewServer(Router(serviceService))
+	router := mux.NewRouter()
+	RegisterHealthHandler(router)
+	testServer := httptest.NewServer(router)
 	defer testServer.Close()
 
 	resp, err := http.Get(testServer.URL + "/health")

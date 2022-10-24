@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"github.com/gorilla/mux"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -20,8 +21,11 @@ var (
 )
 
 func TestMain(m *testing.M) {
-	serviceService := service.NewSector(1)
-	testServer = httptest.NewServer(Router(serviceService))
+	sectorService := service.NewSector(1)
+
+	router := mux.NewRouter()
+	RegisterLocationHandler(router, sectorService)
+	testServer = httptest.NewServer(router)
 
 	code := m.Run()
 
@@ -112,8 +116,10 @@ func TestLocation_missingVel(t *testing.T) {
 }
 
 func TestLocation_wrongTypes(t *testing.T) {
-	serviceService := service.NewSector(1)
-	testServer := httptest.NewServer(Router(serviceService))
+	sectorService := service.NewSector(1)
+	router := mux.NewRouter()
+	RegisterLocationHandler(router, sectorService)
+	testServer := httptest.NewServer(router)
 	defer testServer.Close()
 
 	cases := [][]byte{

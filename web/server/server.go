@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"github.com/gorilla/mux"
 	"net/http"
 	"time"
 
@@ -18,9 +19,14 @@ type Server struct {
 // NewServer create a new http server. The service used by controllers.
 // The server will listen on the 'addr' address.
 func NewServer(addr string, service service.Sector) Server {
+	router := mux.NewRouter()
+	router.StrictSlash(true)
+	api.RegisterHealthHandler(router)
+	api.RegisterLocationHandler(router, service)
+
 	httpServer := http.Server{
 		Addr:         addr,
-		Handler:      api.Router(service),
+		Handler:      router,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
 	}

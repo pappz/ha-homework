@@ -1,23 +1,34 @@
 package api
 
 import (
-	"github.com/pappz/ha-homework/web/middleware"
 	"io"
+	"net/http"
+
+	"github.com/gorilla/mux"
+
+	"github.com/pappz/ha-homework/web/middleware"
 )
 
 const (
 	HealthResponse = `{"alive": true}`
 )
 
-// Health controller to ensure the service is alive
-type Health struct {
+// RegisterHealthHandler sets up the routing of the HTTP handlers.
+func RegisterHealthHandler(router *mux.Router) {
+	m := middleware.JsonParser{}
+	h := health{}
+	router.HandleFunc("/health", m.Handle(h)).Methods(http.MethodGet)
 }
 
-func (h Health) RequestDataType() middleware.Json {
-	return nil
+// health controller to ensure the service is alive
+type health struct {
 }
 
-func (h Health) Do(ri middleware.RequestInfo) (middleware.ResponseData, error) {
+func (h health) Handle(ri middleware.RequestInfo) (middleware.ResponseData, error) {
 	_, err := io.WriteString(ri.W, HealthResponse)
 	return nil, err
+}
+
+func (h health) Payload() middleware.Json {
+	return nil
 }
