@@ -10,7 +10,7 @@ import (
 )
 
 func Router(s service.Sector) *mux.Router {
-	m := middleware.NewMiddleware(s)
+	m := middleware.NewJsonParser(s)
 	router := mux.NewRouter()
 	router.StrictSlash(true)
 	router.HandleFunc("/health", m.Handle(Health{})).Methods(http.MethodGet)

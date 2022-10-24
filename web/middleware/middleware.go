@@ -22,16 +22,16 @@ type ErrorResponse struct {
 	Message string
 }
 
-// Middleware receive http requests, pass through the unmarshaled inputs to the
+// JsonParser receive http requests, pass through the unmarshaled inputs to the
 // controllers and handle errors with the proper status codes. The middlware
 // manage the http headers and status codes in the response.
-type Middleware struct {
+type JsonParser struct {
 	service service.Sector
 }
 
-// NewMiddleware instantiate a new Middleware
-func NewMiddleware(service service.Sector) Middleware {
-	return Middleware{
+// NewJsonParser instantiate a new JsonParser
+func NewJsonParser(service service.Sector) JsonParser {
+	return JsonParser{
 		service: service,
 	}
 }
@@ -40,7 +40,7 @@ func NewMiddleware(service service.Sector) Middleware {
 // with specific error message in json format. After the controller returned with
 // results the middleware send out the response data in json or in case of error
 // response with error code and message reason in json format.
-func (m Middleware) Handle(h Handler) func(http.ResponseWriter, *http.Request) {
+func (m JsonParser) Handle(h Handler) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		rlog := logger.NewLogger("middleware").WithFields(logrus.Fields{"addr": r.RemoteAddr})
 		rlog.Debugf("new request")
@@ -73,7 +73,7 @@ func (m Middleware) Handle(h Handler) func(http.ResponseWriter, *http.Request) {
 	}
 }
 
-func (m Middleware) unmarshalAndValidate(r io.Reader, v interface{}) error {
+func (m JsonParser) unmarshalAndValidate(r io.Reader, v interface{}) error {
 	body, err := io.ReadAll(r)
 	if err != nil {
 		return errFailedToReadBody
@@ -101,7 +101,7 @@ func (m Middleware) unmarshalAndValidate(r io.Reader, v interface{}) error {
 
 // responseError response with error to the request. Set the proper http headers
 // and based on the error type send out the required error message.
-func (m Middleware) responseError(w http.ResponseWriter, e error) {
+func (m JsonParser) responseError(w http.ResponseWriter, e error) {
 	w.Header().Set("Content-Type", "application/json;charset=utf-8")
 	if e == ErrRespInternalError {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -121,7 +121,7 @@ func (m Middleware) responseError(w http.ResponseWriter, e error) {
 
 // responseJson marshal the response content and send out to the http request with
 // the proper headers.
-func (m Middleware) responseJson(w http.ResponseWriter, data interface{}) error {
+func (m JsonParser) responseJson(w http.ResponseWriter, data interface{}) error {
 	w.Header().Set("Content-Type", "application/json;charset=utf-8")
 	j, err := json.Marshal(data)
 	if err != nil {
