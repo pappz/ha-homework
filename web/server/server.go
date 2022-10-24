@@ -8,7 +8,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/pappz/ha-homework/service"
-	"github.com/pappz/ha-homework/web/controllers"
+	"github.com/pappz/ha-homework/web/api"
 )
 
 type Server struct {
@@ -20,7 +20,7 @@ type Server struct {
 func NewServer(addr string, service service.Sector) Server {
 	httpServer := http.Server{
 		Addr:         addr,
-		Handler:      controllers.Router(service),
+		Handler:      api.Router(service),
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
 	}
