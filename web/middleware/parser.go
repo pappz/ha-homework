@@ -7,7 +7,6 @@ import (
 	"net/http"
 
 	"github.com/sirupsen/logrus"
-	"github.com/webkeydev/logger"
 )
 
 var (
@@ -33,7 +32,7 @@ type JsonParser struct {
 // response with error code and message reason in json format.
 func (m JsonParser) Handle(h Handler) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		rlog := logger.NewLogger("middleware").WithFields(logrus.Fields{"addr": r.RemoteAddr})
+		rlog := logrus.WithFields(logrus.Fields{"tag": "ha-dns", "addr": r.RemoteAddr})
 		ri := RequestInfo{
 			W:       w,
 			R:       r,
