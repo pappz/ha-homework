@@ -61,7 +61,7 @@ func (m JsonParser) Handle(handlerFn Handler, dataTypeFn func() Json) func(http.
 		}
 
 		if err := m.responseJson(w, v); err != nil {
-			rlog.Debug("failed to send json: %s", err.Error())
+			rlog.Debugf("failed to send json: %s", err.Error())
 		}
 	}
 }
