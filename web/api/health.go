@@ -17,18 +17,14 @@ const (
 func RegisterHealthHandler(router *mux.Router) {
 	m := middleware.JsonParser{}
 	h := health{}
-	router.HandleFunc("/health", m.Handle(h)).Methods(http.MethodGet)
+	router.HandleFunc("/health", m.Handle(h.Handle, nil)).Methods(http.MethodGet)
 }
 
 // health controller to ensure the service is alive
 type health struct {
 }
 
-func (h health) Handle(ri middleware.RequestInfo) (middleware.ResponseData, error) {
+func (h health) Handle(ri *middleware.RequestInfo) (middleware.ResponseData, error) {
 	_, err := io.WriteString(ri.W, HealthResponse)
 	return nil, err
-}
-
-func (h health) Payload() middleware.Json {
-	return nil
 }

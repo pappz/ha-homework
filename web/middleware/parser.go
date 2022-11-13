@@ -30,13 +30,18 @@ type JsonParser struct {
 // with specific error message in json format. After the controller returned with
 // results the middleware send out the response data in json or in case of error
 // response with error code and message reason in json format.
-func (m JsonParser) Handle(h Handler) func(http.ResponseWriter, *http.Request) {
+func (m JsonParser) Handle(handlerFn Handler, dataTypeFn func() Json) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		rlog := logrus.WithFields(logrus.Fields{"tag": "ha-dns", "addr": r.RemoteAddr})
-		ri := RequestInfo{
-			W:       w,
-			R:       r,
-			Payload: h.Payload(),
+		ri := &RequestInfo{
+			W: w,
+			R: r,
+		}
+
+		if dataTypeFn == nil {
+			ri.Payload = nil
+		} else {
+			ri.Payload = dataTypeFn()
 		}
 		if err := m.unmarshalAndValidate(r.Body, ri.Payload); err != nil {
 			rlog.Debugf("unmarshal issue: '%s'", err.Error())
@@ -44,7 +49,7 @@ func (m JsonParser) Handle(h Handler) func(http.ResponseWriter, *http.Request) {
 			return
 		}
 
-		v, err := h.Handle(ri)
+		v, err := handlerFn(ri)
 		if err != nil {
 			rlog.Debugf("handler error: '%s'", err.Error())
 			m.responseError(w, err)

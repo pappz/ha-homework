@@ -17,9 +17,4 @@ type RequestInfo struct {
 type ResponseData interface{}
 
 // Handler interfaces used by the JsonParser.
-// The Payload should return with data type what the handler expect as input.
-// It could be nil or a pointer to a struct
-type Handler interface {
-	Handle(RequestInfo) (ResponseData, error)
-	Payload() Json
-}
+type Handler func(*RequestInfo) (ResponseData, error)

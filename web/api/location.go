@@ -19,7 +19,7 @@ func RegisterLocationHandler(router *mux.Router, service service.Sector) {
 	l := location{
 		service: service,
 	}
-	router.HandleFunc("/databank", m.Handle(l)).Methods(http.MethodPost)
+	router.HandleFunc("/databank", m.Handle(l.handle, l.jsonRequest)).Methods(http.MethodPost)
 }
 
 // LocationRequest input parameters from the drones
@@ -56,7 +56,7 @@ type location struct {
 	service service.Sector
 }
 
-func (h location) Handle(ri middleware.RequestInfo) (middleware.ResponseData, error) {
+func (h location) handle(ri *middleware.RequestInfo) (middleware.ResponseData, error) {
 	rd := ri.Payload.(*LocationRequest)
 	dd := service.DroneData{
 		X:        *rd.X,
@@ -72,6 +72,6 @@ func (h location) Handle(ri middleware.RequestInfo) (middleware.ResponseData, er
 	return resp, nil
 }
 
-func (h location) Payload() middleware.Json {
+func (h location) jsonRequest() middleware.Json {
 	return &LocationRequest{}
 }
