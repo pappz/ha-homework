@@ -1,11 +1,12 @@
 package api
 
 import (
-	"github.com/gorilla/mux"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/gorilla/mux"
 )
 
 func TestHealth(t *testing.T) {

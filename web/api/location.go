@@ -2,10 +2,12 @@ package api
 
 import (
 	"errors"
+	"net/http"
+
 	"github.com/gorilla/mux"
+
 	"github.com/pappz/ha-homework/service"
 	"github.com/pappz/ha-homework/web/middleware"
-	"net/http"
 )
 
 var (
