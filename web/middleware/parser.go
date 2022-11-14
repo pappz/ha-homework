@@ -21,15 +21,16 @@ type ErrorResponse struct {
 }
 
 // JsonParser receive http requests, pass through the unmarshaled inputs to the
-// controllers and handle errors with the proper status codes. The middlware
+// controllers and handle errors with the proper status codes. The middleware
 // manage the http headers and status codes in the response.
 type JsonParser struct {
 }
 
-// Handle doing validation on the Json request. In case of err it send response
-// with specific error message in json format. After the controller returned with
-// results the middleware send out the response data in json or in case of error
-// response with error code and message reason in json format.
+// Handle doing validation on the Json request. In case of err it send automatically
+// error response with specific error message in json format. After the controller
+// returned with  results the middleware send out the response data in json format.
+// In case if the handlerFn return with error send out error in proper json format
+// and with proper http response code.
 func (m JsonParser) Handle(handlerFn Handler, dataTypeFn func() Json) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		rlog := logrus.WithFields(logrus.Fields{"tag": "ha-dns", "addr": r.RemoteAddr})
