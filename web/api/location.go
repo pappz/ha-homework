@@ -17,11 +17,10 @@ var (
 
 // RegisterLocationHandler sets up the routing of the HTTP handlers.
 func RegisterLocationHandler(router *mux.Router, service service.Sector) {
-	m := middleware.JsonParser{}
 	l := location{
 		service: service,
 	}
-	router.HandleFunc("/databank", m.Handle(l.handle, l.jsonRequest)).Methods(http.MethodPost)
+	router.HandleFunc("/databank", middleware.Handle(l.handle, l.jsonRequest)).Methods(http.MethodPost)
 }
 
 // LocationRequest input parameters from the drones

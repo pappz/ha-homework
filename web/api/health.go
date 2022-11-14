@@ -15,9 +15,8 @@ const (
 
 // RegisterHealthHandler sets up the routing of the HTTP handlers.
 func RegisterHealthHandler(router *mux.Router) {
-	m := middleware.JsonParser{}
 	h := health{}
-	router.HandleFunc("/health", m.Handle(h.Handle, nil)).Methods(http.MethodGet)
+	router.HandleFunc("/health", middleware.Handle(h.Handle, nil)).Methods(http.MethodGet)
 }
 
 // health controller to ensure the service is alive

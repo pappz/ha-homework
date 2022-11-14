@@ -13,7 +13,6 @@ import (
 
 var (
 	errMsgInvalidResp = `{"Message":"invalid input"}`
-	middleware        = JsonParser{}
 )
 
 type sampleResponse struct {
@@ -35,7 +34,7 @@ func emptyHandler() func(http.ResponseWriter, *http.Request) {
 	hfn := func(ri *RequestInfo) (ResponseData, error) {
 		return nil, nil
 	}
-	return middleware.Handle(hfn, nil)
+	return Handle(hfn, nil)
 }
 
 func jsonAsRequestHandler() func(http.ResponseWriter, *http.Request) {
@@ -50,7 +49,7 @@ func jsonAsRequestHandler() func(http.ResponseWriter, *http.Request) {
 	dfn := func() Json {
 		return &sampleRequest{}
 	}
-	return middleware.Handle(hfn, dfn)
+	return Handle(hfn, dfn)
 }
 
 func stringResponseHandler(respData string) func(http.ResponseWriter, *http.Request) {
@@ -59,7 +58,7 @@ func stringResponseHandler(respData string) func(http.ResponseWriter, *http.Requ
 		return nil, nil
 	}
 
-	return middleware.Handle(hfn, nil)
+	return Handle(hfn, nil)
 }
 
 func jsonResponseHandler(respData sampleResponse) func(http.ResponseWriter, *http.Request) {
@@ -67,7 +66,7 @@ func jsonResponseHandler(respData sampleResponse) func(http.ResponseWriter, *htt
 		return respData, nil
 	}
 
-	return middleware.Handle(hfn, nil)
+	return Handle(hfn, nil)
 }
 
 func TestJsonParser_EmptyHandler(t *testing.T) {

@@ -20,18 +20,13 @@ type ErrorResponse struct {
 	Message string
 }
 
-// JsonParser receive http requests, pass through the unmarshaled inputs to the
-// controllers and handle errors with the proper status codes. The middleware
-// manage the http headers and status codes in the response.
-type JsonParser struct {
-}
-
-// Handle doing validation on the Json request. In case of err it send automatically
-// error response with specific error message in json format. After the controller
-// returned with  results the middleware send out the response data in json format.
-// In case if the handlerFn return with error send out error in proper json format
-// and with proper http response code.
-func (m JsonParser) Handle(handlerFn Handler, dataTypeFn func() Json) func(http.ResponseWriter, *http.Request) {
+// Handle doing validation on the Json request and enforce the generalized http response
+// codes, headers and json format. In case of err it send automatically error response
+// with specific error message in json format. After the controller returned with results
+// the middleware send out the response data in json format. In case if the handlerFn
+// return with error send out error in proper json format and with proper http response
+// code.
+func Handle(handlerFn Handler, dataTypeFn func() Json) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		rlog := logrus.WithFields(logrus.Fields{"tag": "ha-dns", "addr": r.RemoteAddr})
 		ri := &RequestInfo{
@@ -44,16 +39,16 @@ func (m JsonParser) Handle(handlerFn Handler, dataTypeFn func() Json) func(http.
 		} else {
 			ri.Payload = dataTypeFn()
 		}
-		if err := m.unmarshalAndValidate(r.Body, ri.Payload); err != nil {
+		if err := unmarshalAndValidate(r.Body, ri.Payload); err != nil {
 			rlog.Debugf("unmarshal issue: '%s'", err.Error())
-			m.responseError(w, err)
+			responseError(w, err)
 			return
 		}
 
 		v, err := handlerFn(ri)
 		if err != nil {
 			rlog.Debugf("handler error: '%s'", err.Error())
-			m.responseError(w, err)
+			responseError(w, err)
 			return
 		}
 
@@ -61,13 +56,13 @@ func (m JsonParser) Handle(handlerFn Handler, dataTypeFn func() Json) func(http.
 			return
 		}
 
-		if err := m.responseJson(w, v); err != nil {
+		if err := responseJson(w, v); err != nil {
 			rlog.Debugf("failed to send json: %s", err.Error())
 		}
 	}
 }
 
-func (m JsonParser) unmarshalAndValidate(r io.Reader, v interface{}) error {
+func unmarshalAndValidate(r io.Reader, v interface{}) error {
 	body, err := io.ReadAll(r)
 	if err != nil {
 		return errFailedToReadBody
@@ -95,7 +90,7 @@ func (m JsonParser) unmarshalAndValidate(r io.Reader, v interface{}) error {
 
 // responseError response with error to the request. Set the proper http headers
 // and based on the error type send out the required error message.
-func (m JsonParser) responseError(w http.ResponseWriter, e error) {
+func responseError(w http.ResponseWriter, e error) {
 	w.Header().Set("Content-Type", "application/json;charset=utf-8")
 	if e == ErrRespInternalError {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -115,7 +110,7 @@ func (m JsonParser) responseError(w http.ResponseWriter, e error) {
 
 // responseJson marshal the response content and send out to the http request with
 // the proper headers.
-func (m JsonParser) responseJson(w http.ResponseWriter, data interface{}) error {
+func responseJson(w http.ResponseWriter, data interface{}) error {
 	w.Header().Set("Content-Type", "application/json;charset=utf-8")
 	j, err := json.Marshal(data)
 	if err != nil {
