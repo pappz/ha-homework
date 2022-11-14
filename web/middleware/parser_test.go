@@ -16,6 +16,10 @@ var (
 	middleware        = JsonParser{}
 )
 
+type sampleResponse struct {
+	Payload string `json:"payload"`
+}
+
 type sampleRequest struct {
 	Payload string `json:"payload"`
 }
@@ -34,7 +38,7 @@ func emptyHandler() func(http.ResponseWriter, *http.Request) {
 	return middleware.Handle(hfn, nil)
 }
 
-func jsonInputHandler() func(http.ResponseWriter, *http.Request) {
+func jsonAsRequestHandler() func(http.ResponseWriter, *http.Request) {
 	hfn := func(ri *RequestInfo) (ResponseData, error) {
 		_, ok := ri.Payload.(*sampleRequest)
 		if !ok {
@@ -58,6 +62,14 @@ func stringResponseHandler(respData string) func(http.ResponseWriter, *http.Requ
 	return middleware.Handle(hfn, nil)
 }
 
+func jsonResponseHandler(respData sampleResponse) func(http.ResponseWriter, *http.Request) {
+	hfn := func(ri *RequestInfo) (ResponseData, error) {
+		return respData, nil
+	}
+
+	return middleware.Handle(hfn, nil)
+}
+
 func TestJsonParser_EmptyHandler(t *testing.T) {
 	resp := setupRecord(emptyHandler(), http.MethodGet, nil)
 	defer resp.Body.Close()
@@ -72,7 +84,7 @@ func TestJsonParser_Handle_JsonRequest(t *testing.T) {
 	sr := sampleRequest{"sample"}
 	jsonData, _ := json.Marshal(sr)
 
-	resp := setupRecord(jsonInputHandler(), http.MethodPost, bytes.NewBuffer(jsonData))
+	resp := setupRecord(jsonAsRequestHandler(), http.MethodPost, bytes.NewBuffer(jsonData))
 	defer resp.Body.Close()
 
 	wantCode := 200
@@ -91,7 +103,7 @@ func TestJsonParser_InvalidJsonRequest(t *testing.T) {
 	sr := sampleRequest{"invalid"}
 	jsonData, _ := json.Marshal(sr)
 
-	resp := setupRecord(jsonInputHandler(), http.MethodPost, bytes.NewBuffer(jsonData))
+	resp := setupRecord(jsonAsRequestHandler(), http.MethodPost, bytes.NewBuffer(jsonData))
 	defer resp.Body.Close()
 
 	wantCode := 400
@@ -116,6 +128,24 @@ func TestJsonParser_StringResponse(t *testing.T) {
 	}
 
 	err := checkBody(resp.Body, sampleResponseString)
+	if err != nil {
+		t.Error(err.Error())
+	}
+}
+
+func TestJsonParser_JsonResponse(t *testing.T) {
+	sampleResp := sampleResponse{"myPayload"}
+	resp := setupRecord(jsonResponseHandler(sampleResp), http.MethodPost, nil)
+	defer resp.Body.Close()
+
+	wantCode := 200
+	if wantCode != resp.StatusCode {
+		t.Fatalf("unexpected response code, want: %d, got: %d\n", wantCode, resp.StatusCode)
+	}
+
+	sampleRespByte, _ := json.Marshal(sampleResp)
+
+	err := checkBody(resp.Body, string(sampleRespByte))
 	if err != nil {
 		t.Error(err.Error())
 	}
