@@ -8,6 +8,7 @@ func TestSector_Location(t *testing.T) {
 		sectorId  int
 		droneData DroneData
 		want      float64
+		wantErr   bool
 	}{
 		{
 			1,
@@ -18,6 +19,7 @@ func TestSector_Location(t *testing.T) {
 				20,
 			},
 			1389.57,
+			false,
 		},
 		{
 			2,
@@ -28,6 +30,7 @@ func TestSector_Location(t *testing.T) {
 				20,
 			},
 			2759.14,
+			false,
 		},
 		{
 			1,
@@ -38,12 +41,33 @@ func TestSector_Location(t *testing.T) {
 				1,
 			},
 			4,
+			false,
+		},
+		{
+			1,
+			DroneData{
+				-1,
+				-1,
+				-1,
+				-1,
+			},
+			0,
+			true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run("location", func(t *testing.T) {
 			s := NewSector(tt.sectorId)
-			if got := s.Location(tt.droneData); got != tt.want {
+			got, err := s.Location(tt.droneData)
+			if tt.wantErr && err == nil {
+				t.Errorf("expected err but got nil")
+			}
+
+			if !tt.wantErr && err != nil {
+				t.Errorf("expected nil err but got err: %s", err)
+			}
+
+			if got != tt.want {
 				t.Errorf("Location() = %v, want %v", got, tt.want)
 			}
 		})

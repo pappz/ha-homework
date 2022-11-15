@@ -46,7 +46,7 @@ func jsonAsRequestHandler() func(http.ResponseWriter, *http.Request) {
 		return nil, nil
 	}
 
-	dfn := func() Json {
+	dfn := func() interface{} {
 		return &sampleRequest{}
 	}
 	return Handle(hfn, dfn)

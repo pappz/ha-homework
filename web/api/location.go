@@ -5,14 +5,14 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/pappz/ha-homework/service"
 	"github.com/pappz/ha-homework/web/middleware"
 )
 
 var (
-	errInvalidCoordinate = errors.New("invalid coordinate")
-	errInvalidVelocity   = errors.New("invalid velocity")
+	errMissingMandatoryField = errors.New("missing field(s)")
 )
 
 // RegisterLocationHandler sets up the routing of the HTTP handlers.
@@ -32,17 +32,17 @@ type LocationRequest struct {
 }
 
 func (rd LocationRequest) Validate() error {
-	if rd.X == nil || *rd.X < 0 {
-		return errInvalidCoordinate
+	if rd.X == nil {
+		return errMissingMandatoryField
 	}
-	if rd.Y == nil || *rd.Y < 0 {
-		return errInvalidCoordinate
+	if rd.Y == nil {
+		return errMissingMandatoryField
 	}
-	if rd.Z == nil || *rd.Z < 0 {
-		return errInvalidCoordinate
+	if rd.Z == nil {
+		return errMissingMandatoryField
 	}
-	if rd.Vel == nil || *rd.Vel <= 0 {
-		return errInvalidVelocity
+	if rd.Vel == nil {
+		return errMissingMandatoryField
 	}
 	return nil
 }
@@ -66,7 +66,11 @@ func (h location) handle(ri *middleware.RequestInfo) (middleware.ResponseData, e
 		Velocity: *rd.Vel,
 	}
 
-	loc := h.service.Location(dd)
+	loc, err := h.service.Location(dd)
+	if err != nil {
+		return h.handleError(err)
+	}
+
 	resp := LocationResponse{
 		loc,
 	}
@@ -75,4 +79,14 @@ func (h location) handle(ri *middleware.RequestInfo) (middleware.ResponseData, e
 
 func (h location) jsonRequest() interface{} {
 	return &LocationRequest{}
+}
+
+// handleError hide the internal error from user
+func (h location) handleError(err error) (middleware.ResponseData, error) {
+	if err == service.ErrInvalidCoordinate || err == service.ErrInvalidVelocity {
+		return nil, err
+	}
+
+	log.Errorf("unexpected error: %s", err.Error())
+	return nil, middleware.ErrRespInternalError
 }

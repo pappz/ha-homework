@@ -16,9 +16,8 @@ import (
 )
 
 var (
-	errMsgInvalidCoordinate = fmt.Sprintf(`{"Message":"%s"}`, errInvalidCoordinate.Error())
-	errMsgInvalidVelocity   = fmt.Sprintf(`{"Message":"%s"}`, errInvalidVelocity.Error())
-	testServer              *httptest.Server
+	errMsgMissingMandatoryField = fmt.Sprintf(`{"Message":"%s"}`, errMissingMandatoryField.Error())
+	testServer                  *httptest.Server
 )
 
 func TestMain(m *testing.M) {
@@ -75,6 +74,11 @@ func TestLocation_missingCoords(t *testing.T) {
 				"y": "456.56",
 				"vel": "20.0"
 			}`),
+		[]byte(`{
+				"x": "123.12",
+				"y": "456.56",
+				"z": "789.89"
+			}`),
 	}
 
 	for i := 0; i < len(cases); i++ {
@@ -86,34 +90,12 @@ func TestLocation_missingCoords(t *testing.T) {
 			t.Fatalf("received incorrect response code: %d\n", resp.StatusCode)
 		}
 
-		err = checkBody(resp.Body, errMsgInvalidCoordinate)
+		err = checkBody(resp.Body, errMsgMissingMandatoryField)
 		if err != nil {
 			t.Errorf("%s", err.Error())
 		}
 		_ = resp.Body.Close()
 	}
-}
-
-func TestLocation_missingVel(t *testing.T) {
-	requestData := []byte(`{
-				"x": "123.12",
-				"y": "456.56",
-				"z": "789.89"
-			}`)
-
-	resp, err := doRequest(http.MethodPost, testServer.URL+"/databank", bytes.NewBuffer(requestData))
-	if err != nil {
-		t.Fatalf("client request error: %s\n", err.Error())
-	}
-	if 400 != resp.StatusCode {
-		t.Fatalf("received incorrect response code: %d\n", resp.StatusCode)
-	}
-
-	err = checkBody(resp.Body, errMsgInvalidVelocity)
-	if err != nil {
-		t.Errorf("%s", err.Error())
-	}
-	_ = resp.Body.Close()
 }
 
 func TestLocation_wrongTypes(t *testing.T) {
