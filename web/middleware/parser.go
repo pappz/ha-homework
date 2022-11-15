@@ -63,13 +63,13 @@ func Handle(handlerFn Handler, dataTypeFn func() Json) func(http.ResponseWriter,
 }
 
 func unmarshalAndValidate(r io.Reader, v interface{}) error {
+	if v == nil {
+		return nil
+	}
+
 	body, err := io.ReadAll(r)
 	if err != nil {
 		return errFailedToReadBody
-	}
-
-	if v == nil {
-		return nil
 	}
 
 	if len(body) == 0 {
