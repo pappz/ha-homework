@@ -73,6 +73,6 @@ func (h location) handle(ri *middleware.RequestInfo) (middleware.ResponseData, e
 	return resp, nil
 }
 
-func (h location) jsonRequest() middleware.Json {
+func (h location) jsonRequest() interface{} {
 	return &LocationRequest{}
 }

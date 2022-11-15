@@ -9,7 +9,7 @@ import (
 type RequestInfo struct {
 	W       http.ResponseWriter
 	R       *http.Request
-	Payload Json
+	Payload interface{}
 }
 
 // ResponseData will be sent out by the middleware to the http

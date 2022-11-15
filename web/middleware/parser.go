@@ -26,7 +26,7 @@ type ErrorResponse struct {
 // the middleware send out the response data in json format. In case if the handlerFn
 // return with error send out error in proper json format and with proper http response
 // code.
-func Handle(handlerFn Handler, dataTypeFn func() Json) func(http.ResponseWriter, *http.Request) {
+func Handle(handlerFn Handler, dataTypeFn func() interface{}) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		rlog := logrus.WithFields(logrus.Fields{"tag": "ha-dns", "addr": r.RemoteAddr})
 		ri := &RequestInfo{
